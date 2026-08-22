@@ -1,0 +1,27 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Home Page </title>
+</head>
+<body>
+    <div>
+        <div> 
+            <h1> Available Rooms </h1>
+            {% for room in rooms %}
+                <div> 
+                    <h3> {{room.id}} <a href= "{% url 'room' room.id %}"> {{room.name}} </a> </h3>
+                    <p> {{room.description}}</p>
+                </div>
+            {% endfor %}
+        </div>
+        
+    </div>
+</body>
+</html>
+
+{% endblock content %}
