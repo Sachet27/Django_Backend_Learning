@@ -12,14 +12,20 @@
     <div>
         <div> 
             <h1> Available Rooms </h1>
+            <a href= "{% url 'create_room' %}"><button> Create a room </button> </a>
+            <br><br>
             {% for room in rooms %}
                 <div> 
-                    <h3> {{room.id}} <a href= "{% url 'room' room.id %}"> {{room.name}} </a> </h3>
-                    <p> {{room.description}}</p>
+                    <span> @{{room.host.username}} </span>
+                    <h5> {{room.id}} <a href= "{% url 'room' room.id %}"> {{room.name}} </a> </h5>
+                    <small> {{room.topic.name}}</small>
+                    <br>
+                    <a href= "{% url 'update_room' room.id %}"> <button> Edit </button> </a>
+                    <a href="{% url 'delete_room' room.id %}"> <button> Delete </button></a>
+                    <hr>
                 </div>
             {% endfor %}
         </div>
-        
     </div>
 </body>
 </html>
