@@ -1,24 +1,62 @@
 from django.shortcuts import render, redirect
-from .models import Room
+from django.db.models import Q
+from .models import Room, Topic, Message
 from .forms import RoomForm
-
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
 def home(request):
-    rooms= Room.objects.all()
-    context= {'rooms': rooms}
+
+    # default value '' as second parameter
+    q= request.GET.get('q', '') 
+
+    rooms= Room.objects.filter(
+        Q(topic__name__icontains = q) |
+        Q(name__icontains = q) |
+        Q(description__icontains = q)
+    )
+    room_count = rooms.count()
+
+    topics= Topic.objects.all()
+
+    context= {
+        'rooms': rooms,
+        'topics': topics,
+        'room_count': room_count
+    }
 
     return render(request, 
                   'base/home.html', 
                   context
                   )
 
+ 
 def room(request, room_id= 1):
     room= Room.objects.get(id= room_id)
+    messages= room.messages.all().order_by('-created') 
+    participants= room.participants.all()
 
-    context= {'room': room}
+    if request.method == 'POST':
+        Message.objects.create(
+            user= request.user,
+            room= room,
+            body= request.POST.get('body')
+        )
+
+        #duplicate safe
+        room.participants.add(request.user)
+
+        return redirect('room', room_id = room.id)
+
+    context= {'room': room, 
+              'room_messages': messages,
+              'participants': participants
+              }
     return render(request, 'base/room.html', context)
 
 
+
+@login_required(login_url = 'login')
 def create_room(request):
     form= RoomForm()
     if request.method == 'POST':
@@ -32,9 +70,15 @@ def create_room(request):
 
     return render(request, 'base/room_form.html', context)
 
+
+@login_required(login_url= 'login')
 def update_room(request, room_id):
     room= Room.objects.get(id= room_id)
     form= RoomForm(instance= room)
+
+    #validating if the host is the one editing/deleting
+    if request.user != room.host:
+        return HttpResponse('You are not the host of this room.')
 
     if request.method == 'POST':
         form= RoomForm(request.POST, instance= room)
@@ -47,8 +91,15 @@ def update_room(request, room_id):
     return render(request, 'base/room_form.html', context)
 
 
+@login_required(login_url= 'login')
 def delete_room(request, room_id):
     room= Room.objects.get(id= room_id)
+
+    #validating if the host is the one editing/deleting
+    if request.user != room.host:
+        return HttpResponse('You are not the host of this room.')
+
+
     if request.method == 'POST':
         room.delete()
         return redirect('home')
@@ -57,4 +108,22 @@ def delete_room(request, room_id):
         'obj' : room
     }
     return render(request, 'base/delete.html', context)
-    
+
+
+@login_required(login_url= 'login')
+def delete_message(request, message_id):
+    message= Message.objects.get(id= message_id)
+
+    #validating if the host is the one editing/deleting
+    if request.user != message.user:
+        return HttpResponse('You are not the creator of this message.')
+
+
+    if request.method == 'POST':
+        message.delete()
+        return redirect('home')
+
+    context= {
+        'obj' : message
+    }
+    return render(request, 'base/delete.html', context)

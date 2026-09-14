@@ -1,15 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nav Bar</title>
-</head>
-<body>
-    <a href= '/'> 
-        <h1> LOGO </h1>
-    </a>
+<a href= "{% url 'home' %}"> 
+    <h1> LOGO </h1>
+</a>
 
-    <hr>
-</body>
-</html>
+<form method="get" action="{% url 'home' %}">
+    <input type="text" name="q" placeholder="Search Rooms..."/>
+    <button type="submit">Search</button>
+</form>
+
+{% if request.user.is_authenticated %}
+<h3> Hello, {{request.user}} </h3>
+<a href="{% url 'logout' %}"> Logout </a>
+{% else %}
+<a href="{% url 'login' %}"> Login </a>
+{% endif %}
+<hr>
