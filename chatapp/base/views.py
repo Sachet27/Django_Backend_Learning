@@ -17,18 +17,23 @@ def home(request):
     )
     room_count = rooms.count()
 
+    last_n_recent = 5
+    messages = Message.objects.filter(Q(body__icontains = q) | Q(room__name__icontains = q)).order_by('-updated')[:last_n_recent]
+
     topics= Topic.objects.all()
 
     context= {
         'rooms': rooms,
         'topics': topics,
-        'room_count': room_count
+        'room_count': room_count,
+        'recent_messages': messages
     }
 
     return render(request, 
                   'base/home.html', 
                   context
                   )
+
 
  
 def room(request, room_id= 1):
