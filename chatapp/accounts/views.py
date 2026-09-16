@@ -6,7 +6,6 @@ from django.contrib.auth.forms import UserCreationForm
 
 # Create your views here.
 def login_view(request):
-    page= 'login'
 
     if request.user.is_authenticated:
         return redirect('home')
@@ -23,9 +22,9 @@ def login_view(request):
         
         messages.error(request, 'Username or password is invalid')
 
-    context= {'page': page}
+    context= {}
 
-    return render(request, 'accounts/login_register.html', context)
+    return render(request, 'accounts/login.html', context)
 
 
 
@@ -55,4 +54,4 @@ def register_view(request):
         'form': form
         }
 
-    return render(request, 'accounts/login_register.html' ,context)
+    return render(request, 'accounts/register.html' ,context)
