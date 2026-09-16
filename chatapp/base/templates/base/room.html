@@ -135,9 +135,9 @@
           </div>
       </div>
       <div class="room__message">
-        <form action="{% url 'room' room.id %}" method="post">
+        <form action="" method="post">
           {% csrf_token %}
-          <input name="" placeholder="Write your message here..." />
+          <input type="text" name="body" placeholder="Write your message here..." />
         </form>
       </div>
     </div>
