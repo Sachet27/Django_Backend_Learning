@@ -54,4 +54,4 @@ def register_view(request):
         'form': form
         }
 
-    return render(request, 'accounts/register.html' ,context)
+    return render(request, 'accounts/register.html' ,context)    

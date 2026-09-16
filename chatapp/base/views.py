@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.db.models import Q
+from django.db.models import Q, Count
 from .models import Room, Topic, Message, User
 from .forms import RoomForm, UserForm
 from django.contrib.auth.decorators import login_required
@@ -20,7 +20,10 @@ def home(request):
     last_n_recent = 5
     messages = Message.objects.filter(Q(body__icontains = q) | Q(room__name__icontains = q)).order_by('-updated')[:last_n_recent]
 
-    topics= Topic.objects.all()
+    max_n_topics= 5
+    topics= Topic.objects.annotate(
+        room_count = Count('room') 
+    ).order_by('-room_count')[:max_n_topics]
 
     context= {
         'rooms': rooms,
@@ -185,3 +188,29 @@ def update_user(request):
     }
 
     return render(request, 'base/update_user.html', context)
+
+
+
+def topics(request):
+
+
+    q= request.GET.get('q', '')
+    topics= Topic.objects.filter(
+        name__icontains= q
+    )
+
+    room_count= Room.objects.count()
+
+    context= {
+        'topics': topics,
+        'room_count': room_count
+    }
+    return render(request, 'base/topics.html', context)
+
+
+def activities(request):
+    last_n_recent= 5
+    messages= Message.objects.all()[:last_n_recent]
+
+    context= {'room_messages': messages}
+    return render(request, 'base/activity.html', context)
