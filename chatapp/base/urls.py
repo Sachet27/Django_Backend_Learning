@@ -8,5 +8,5 @@ urlpatterns= [
     path('update-room/<int:room_id>/', views.update_room, name= 'update_room'),
     path('delete-room/<int:room_id>/', views.delete_room, name= 'delete_room'),
     path('delete-message/<int:message_id>/', views.delete_message, name= 'delete_message'),
-    
+    path('profile/<int:user_id>', views.user_profile, name='user_profile'),
 ]
