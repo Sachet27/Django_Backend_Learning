@@ -1,4 +1,5 @@
 {% extends 'main.html' %}
+{% load static %}
 
 {% block content %}
 
@@ -27,7 +28,11 @@
           <div class="activities__boxHeader roomListRoom__header">
             <a href="{% url 'user_profile' message.user.id %}" class="roomListRoom__author">
               <div class="avatar avatar--small">
-                <img src="https://randomuser.me/api/portraits/women/11.jpg" />
+                {% if message.user.profile.profile_picture %}
+                <img src="{{message.user.profile.profile_picture.url}}"/>
+                {% else %}
+                <img src="{% static 'images/no-pfp.jpg' %}" />
+                {% endif %}
               </div>
               <p>
                 @{{message.user.username}}
