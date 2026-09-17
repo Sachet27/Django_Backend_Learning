@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.db.models import Q, Count
 from .models import Room, Topic, Message, User
-from .forms import RoomForm, UserForm
+from .forms import RoomForm
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
@@ -153,46 +153,8 @@ def delete_message(request, message_id):
     return render(request, 'base/delete.html', context)
 
 
-def user_profile(request, user_id):
-    user= User.objects.get(id = user_id)
-    rooms= user.hosted_rooms.all()
-
-    last_n_recent= 5
-    messages= user.messages.order_by('-updated')[:last_n_recent]
-
-    topics= Topic.objects.all()
-
-    context= {
-        'user': user,
-        'rooms' : rooms,
-        'recent_messages': messages,
-        'topics': topics
-    }
-    return render(request, 'base/profile.html', context= context)
-
-
-@login_required(login_url= 'login')
-def update_user(request):
-    user= request.user
-    form= UserForm(instance= user)
-
-    if request.method == 'POST':
-        form= UserForm( request.POST ,instance= user)
-        if form.is_valid():
-            form.save()
-            return redirect('user_profile', user_id = user.id)
-
-
-    context= {
-        'form': form
-    }
-
-    return render(request, 'base/update_user.html', context)
-
-
 
 def topics(request):
-
 
     q= request.GET.get('q', '')
     topics= Topic.objects.filter(
@@ -206,6 +168,7 @@ def topics(request):
         'room_count': room_count
     }
     return render(request, 'base/topics.html', context)
+
 
 
 def activities(request):
